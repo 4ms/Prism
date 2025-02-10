@@ -66,10 +66,6 @@ target_sources(Prism
     ${SOURCE_DIR}/src/scales/WC_Gamma_notused.cpp
 )
 
-target_include_directories(Prism PRIVATE 
-	${SOURCE_DIR}/src 
-)
-
 target_compile_options(Prism
 	PRIVATE 
 )
