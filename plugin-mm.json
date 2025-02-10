@@ -1,0 +1,16 @@
+{
+    "MetaModulePluginMaintainer": "",
+    "MetaModulePluginMaintainerEmail": "",
+    "MetaModulePluginMaintainerUrl": "",
+    "MetaModuleDescription": "",
+    "MetaModuleIncludedModules": [
+    {
+      "slug": "Rainbow",
+      "name": "Rainbow"
+    },
+    {
+      "slug": "Droplet",
+      "name": "Droplet"
+    }
+    ]
+}
