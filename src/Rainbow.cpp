@@ -271,6 +271,10 @@ struct Rainbow : core::PrismModule {
 		json_t* scale_array		 = json_array();
 		json_t* scale_bank_array = json_array();
 
+#if defined(METAMODULE)
+		populate_state();
+#endif
+
 		for (int i = 0; i < NUM_CHANNELS; i++) {
 			json_t* noteJ   	= json_integer(state.note[i]);
 			json_t* scaleJ	  	= json_integer(state.scale[i]);
@@ -921,7 +925,10 @@ void Rainbow::prepare(void) {
 	input.process_rotateCV();
 	input.process_scaleCV();
 	levels.update();
+#if !defined(METAMODULE)
+	// For MetaModule, we shave ~10% processor load by doing this only when needed
 	populate_state();
+#endif
 }
 
 void Rainbow::set_default_param_values(void) {

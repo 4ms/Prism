@@ -70,7 +70,7 @@ target_compile_options(Prism
 	PRIVATE 
 )
 
-set_property(TARGET Prism PROPERTY CXX_STANDARD 20)
+set_property(TARGET Prism PROPERTY CXX_STANDARD 23)
 
 if("${INSTALL_DIR}" STREQUAL "")
     set(INSTALL_DIR ${CMAKE_CURRENT_LIST_DIR}/metamodule-plugins)
