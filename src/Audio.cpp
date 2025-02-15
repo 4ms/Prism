@@ -92,14 +92,11 @@ void Audio::ChannelProcess1(rainbow::IO &io, rack::engine::Input &input, rack::e
 		// 10us from here to end block, = 0.33us amortized
 
 		// Convert output buffer
-		for (int chan = 0; chan < NUM_CHANNELS; chan++) {
-			for (int i = 0; i < NUM_SAMPLES; i++) {
-				outputFrames1[i].samples[0] = 0;
-			}
-		}
-
-		for (int chan = 0; chan < NUM_CHANNELS; chan++) {
-			for (int i = 0; i < NUM_SAMPLES; i++) {
+		// was 7.85us => 0.24 amortized
+		// this way is 4.3us => 0.13 amortized
+		for (int i = 0; i < NUM_SAMPLES; i++) {
+			outputFrames1[i].samples[0] = 0;
+			for (int chan = 0; chan < NUM_CHANNELS; chan++) {
 				outputFrames1[i].samples[0] += io.out[chan][i] / MAX_12BIT;
 			}
 		}
