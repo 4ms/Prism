@@ -61,7 +61,7 @@ void Audio::ChannelProcess1(rainbow::IO &io, rack::engine::Input &input, rack::e
 			nInputBuffer[i].startIncr(inLen);
 
 			for (int j = 0; j < NUM_SAMPLES; j++) {
-				int32_t v = (int32_t)clamp(nInputFrames[i][j].samples[0] * MAX_12BIT, MIN_12BIT, MAX_12BIT);
+				int32_t v = std::clamp(nInputFrames[i][j].samples[0] * MAX_12BIT, MIN_12BIT, MAX_12BIT);
 
 				switch(inChannels) {
 					case 1:

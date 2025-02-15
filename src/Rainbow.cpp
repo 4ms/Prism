@@ -689,10 +689,10 @@ void Rainbow::process(const ProcessArgs &args) {
 
 	int noiseSelected 	= params[NOISE_PARAM].getValue();
 
-	io.MORPH_ADC		= (uint16_t)clamp(params[MORPH_PARAM].getValue() + inputs[MORPH_INPUT].getVoltage() * 409.5f, 0.0f, 4095.0f);
-	io.SPREAD_ADC		= (uint16_t)clamp(params[SPREAD_PARAM].getValue() + inputs[SPREAD_INPUT].getVoltage() * 409.5f, 0.0f, 4095.0f);
+	io.MORPH_ADC		= std::clamp<int32_t>(params[MORPH_PARAM].getValue() + inputs[MORPH_INPUT].getVoltage() * 409.5f, 0, 4095);
+	io.SPREAD_ADC		= std::clamp<int32_t>(params[SPREAD_PARAM].getValue() + inputs[SPREAD_INPUT].getVoltage() * 409.5f, 0, 4095);
 
-	io.GLOBAL_Q_LEVEL	= (int16_t)clamp(inputs[GLOBAL_Q_INPUT].getVoltage() * 409.5f, -4095.0f, 4095.0f);
+	io.GLOBAL_Q_LEVEL	= std::clamp(inputs[GLOBAL_Q_INPUT].getVoltage() * 409.5f, -4095.0f, 4095.0f);
 	io.GLOBAL_Q_CONTROL	= (int16_t)params[GLOBAL_Q_PARAM].getValue();
 
 	io.GLOBAL_LEVEL_ADC = params[GLOBAL_LEVEL_PARAM].getValue() / 4095.0f;
@@ -705,12 +705,12 @@ void Rainbow::process(const ProcessArgs &args) {
 		if (!inputs[MONO_LEVEL_INPUT + n].isConnected() && !inputs[POLY_LEVEL_INPUT].isConnected()) { 
 			io.LEVEL_CV[n] = 1.0f;
 		 } else {
-			io.LEVEL_CV[n] = clamp((inputs[MONO_LEVEL_INPUT + n].getVoltage() + inputs[POLY_LEVEL_INPUT].getVoltage(n) + 5.0f) / 10.0f, 0.0f, 1.0f);
+			io.LEVEL_CV[n] = std::clamp((inputs[MONO_LEVEL_INPUT + n].getVoltage() + inputs[POLY_LEVEL_INPUT].getVoltage(n) + 5.0f) / 10.0f, 0.0f, 1.0f);
 		 }
 
-		io.LEVEL_ADC[n] 		= clamp(params[CHANNEL_LEVEL_PARAM + n].getValue() / 4095.0f, 0.0f, 1.0f);
-		io.CHANNEL_Q_LEVEL[n] 	= (int16_t)clamp((inputs[MONO_Q_INPUT + n].getVoltage() + inputs[POLY_Q_INPUT].getVoltage(n)) * 409.5f, -4095.0f, 4095.0f);
-		io.CHANNEL_Q_CONTROL[n]	= (int16_t)params[CHANNEL_Q_PARAM + n].getValue();
+		io.LEVEL_ADC[n] 		= std::clamp(params[CHANNEL_LEVEL_PARAM + n].getValue() / 4095.0f, 0.0f, 1.0f);
+		io.CHANNEL_Q_LEVEL[n] 	= std::clamp<int32_t>((inputs[MONO_Q_INPUT + n].getVoltage() + inputs[POLY_Q_INPUT].getVoltage(n)) * 409.5f, -4095, 4095);
+		io.CHANNEL_Q_CONTROL[n]	= params[CHANNEL_Q_PARAM + n].getValue();
 		io.TRANS_DIAL[n]		= params[TRANS_PARAM + n].getValue();
 	}
 	///
@@ -719,14 +719,14 @@ void Rainbow::process(const ProcessArgs &args) {
 	io.FREQNUDGE1_ADC = (int16_t)params[FREQNUDGE1_PARAM].getValue();
 	io.FREQNUDGE6_ADC = (int16_t)params[FREQNUDGE6_PARAM].getValue();
 
-	io.SCALE_ADC = (uint16_t)clamp(inputs[SCALE_INPUT].getVoltage() * 409.5f, 0.0f, 4095.0f);
-	io.ROTCV_ADC = (uint16_t)clamp(inputs[ROTATECV_INPUT].getVoltage() * 409.5f, 0.0f, 4095.0f);
+	io.SCALE_ADC = std::clamp<uint16_t>(inputs[SCALE_INPUT].getVoltage() * 409.5f, 0, 4095);
+	io.ROTCV_ADC = std::clamp<uint16_t>(inputs[ROTATECV_INPUT].getVoltage() * 409.5f, 0, 4095);
 
 	io.FREQCV1_CHAN	= inputs[FREQCV1_INPUT].getChannels();
 	io.FREQCV6_CHAN	= inputs[FREQCV6_INPUT].getChannels();
 	for (int i = 0; i < 3; i++) {
-		io.FREQCV1_CV[i] = clamp(inputs[FREQCV1_INPUT].getVoltage(i) * 0.5f, -5.0f, 5.0f); 
-		io.FREQCV6_CV[i] = clamp(inputs[FREQCV6_INPUT].getVoltage(i) * 0.5f, -5.0f, 5.0f); 
+		io.FREQCV1_CV[i] = std::clamp(inputs[FREQCV1_INPUT].getVoltage(i) * 0.5f, -5.0f, 5.0f); 
+		io.FREQCV6_CV[i] = std::clamp(inputs[FREQCV1_INPUT].getVoltage(i) * 0.5f, -5.0f, 5.0f); 
 	}
 	// mark (0.9)
 
@@ -780,10 +780,10 @@ void Rainbow::process(const ProcessArgs &args) {
 	outputs[POLY_VOCT_OUTPUT].setChannels(6);
 	outputs[POLY_ENV_OUTPUT].setChannels(12);
 	for (int n = 0; n < NUM_CHANNELS; n++) {
-		outputs[POLY_ENV_OUTPUT].setVoltage(clamp(io.env_out[n] * 100.0f, 0.0f, 10.0f), n);
+		outputs[POLY_ENV_OUTPUT].setVoltage(std::clamp(io.env_out[n] * 100.0f, 0.0f, 10.0f), n);
 		outputs[POLY_ENV_OUTPUT].setVoltage(io.OUTLEVEL[n] * 10.0f, n + 6);
 		outputs[POLY_VOCT_OUTPUT].setVoltage(io.voct_out[n], n);
-		outputs[MONO_ENV_OUTPUT + n].setVoltage(clamp(io.env_out[n] * 100.0f, 0.0f, 10.0f));
+		outputs[MONO_ENV_OUTPUT + n].setVoltage(std::clamp(io.env_out[n] * 100.0f, 0.0f, 10.0f));
 		outputs[MONO_VOCT_OUTPUT + n].setVoltage(io.voct_out[n]);
 
 		params[Rainbow::LEVEL_OUT_PARAM + n].setValue(io.OUTLEVEL[n]);
