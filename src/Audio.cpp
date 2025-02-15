@@ -6,6 +6,7 @@ float Audio::generateNoise() {
 	float nO;
 	switch (noiseSelected) {
 		case 0:
+			// Brown: Add up to 10% processing load (adds up to 2.0us per sample)
 			nO = brown.next() * 10.0f - 5.0f;
 			break;
 		case 1:
@@ -49,6 +50,7 @@ void Audio::ChannelProcess1(rainbow::IO &io, rack::engine::Input &input, rack::e
 
 	// Process buffer
 	if (outputBuffer1.empty()) {
+		// this happens every 32 samples:
 
 		for (int i = 0; i < inChannels; i++) {
 			nInputSrc[i].setRates(sampleRate, internalSampleRate);
@@ -85,8 +87,9 @@ void Audio::ChannelProcess1(rainbow::IO &io, rack::engine::Input &input, rack::e
 			}
 		}
 
-		// Pass to filter
+		// Pass to filter. Happens every 32 samples, takes 20.2us (0.63us)
 		filterbank.process_audio_block();
+		// 10us from here to end block, = 0.33us amortized
 
 		// Convert output buffer
 		for (int chan = 0; chan < NUM_CHANNELS; chan++) {

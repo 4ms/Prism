@@ -544,7 +544,10 @@ struct Rainbow : core::PrismModule {
 
 void Rainbow::process(const ProcessArgs &args) {
 
+	// <50ns
 	PrismModule::step();
+
+	// Mark 1 start (3.6us until prepare())
 
 	io.UI_UPDATE = false;
 	if (++frameC > frameRate) {
@@ -584,6 +587,8 @@ void Rainbow::process(const ProcessArgs &args) {
 	} else {
 		io.ROTDOWN_TRIGGER = false;
 	}
+
+	// 0.2us mean from HERE...
 
 	if (rotCWButtonTrigger.process(params[ROTCW_PARAM].getValue())) {
 		io.ROTUP_BUTTON = true;
@@ -632,7 +637,9 @@ void Rainbow::process(const ProcessArgs &args) {
 			io.LOCK_ON[3] = !io.LOCK_ON[3];
 		}
 	} 
+	// to here (0.2us)
 
+	// for loop: usually 0.2us could be 0.6us
 	for (int n = 0; n < 6; n++) {
 		// Process Locks
 		if (lockTriggers[n].process(params[LOCKON_PARAM + n].getValue())) {
@@ -645,6 +652,7 @@ void Rainbow::process(const ProcessArgs &args) {
 		}
 	}
 
+	// Here to for loop: 0.6us
 	// Handle bank/filter change
 	nextBank = params[BANK_PARAM].getValue();
 	nextFilter = (FilterSetting)params[FILTER_PARAM].getValue();
@@ -689,7 +697,10 @@ void Rainbow::process(const ProcessArgs &args) {
 
 	io.GLOBAL_LEVEL_ADC = params[GLOBAL_LEVEL_PARAM].getValue() / 4095.0f;
 	io.GLOBAL_LEVEL_CV	= inputs[GLOBAL_LEVEL_INPUT].getVoltage() / 5.0f;
+	// ... 0.6us to here
 
+
+	// for loop: 1.6us
 	for (int n = 0; n < NUM_CHANNELS; n++) {
 		if (!inputs[MONO_LEVEL_INPUT + n].isConnected() && !inputs[POLY_LEVEL_INPUT].isConnected()) { 
 			io.LEVEL_CV[n] = 1.0f;
@@ -702,7 +713,9 @@ void Rainbow::process(const ProcessArgs &args) {
 		io.CHANNEL_Q_CONTROL[n]	= (int16_t)params[CHANNEL_Q_PARAM + n].getValue();
 		io.TRANS_DIAL[n]		= params[TRANS_PARAM + n].getValue();
 	}
+	///
 
+	// 0.9us to mark //0.2 with std::clamp //0.43 with first wto clamp, last ones in for loop std::clamp
 	io.FREQNUDGE1_ADC = (int16_t)params[FREQNUDGE1_PARAM].getValue();
 	io.FREQNUDGE6_ADC = (int16_t)params[FREQNUDGE6_PARAM].getValue();
 
@@ -715,7 +728,9 @@ void Rainbow::process(const ProcessArgs &args) {
 		io.FREQCV1_CV[i] = clamp(inputs[FREQCV1_INPUT].getVoltage(i) * 0.5f, -5.0f, 5.0f); 
 		io.FREQCV6_CV[i] = clamp(inputs[FREQCV6_INPUT].getVoltage(i) * 0.5f, -5.0f, 5.0f); 
 	}
+	// mark (0.9)
 
+	// 0.1 to mark
 	io.SLEW_ADC	= (uint16_t)params[SLEW_PARAM].getValue();
 	io.ENV_SWITCH = (EnvelopeMode)params[ENV_PARAM].getValue();
 
@@ -730,9 +745,14 @@ void Rainbow::process(const ProcessArgs &args) {
 	if (scaleRotTrigger.process(params[SCALEROT_PARAM].getValue())) {
 		io.SCALEROT_SWITCH = !io.SCALEROT_SWITCH;
 	} 
+	// mark (0.1us)
 
+	// Mark 1 end: 3.6us
+
+	// prepare: 0.9us
 	prepare();
 
+	// This takes 3us - 35us
 	audio.inputChannels = std::min(inputs[POLY_IN_INPUT].getChannels(), 6);
 	audio.outputChannels = params[OUTCHAN_PARAM].getValue(); 
 	audio.noiseSelected = noiseSelected;
@@ -753,8 +773,10 @@ void Rainbow::process(const ProcessArgs &args) {
 		default:
 			audio.ChannelProcess1(io, inputs[POLY_IN_INPUT], outputs[POLY_OUT_OUTPUT], filterbank);
 	}
+	///mark (3-35us)
 
 	// Populate poly outputs
+	// 1us to end of for loop
 	outputs[POLY_VOCT_OUTPUT].setChannels(6);
 	outputs[POLY_ENV_OUTPUT].setChannels(12);
 	for (int n = 0; n < NUM_CHANNELS; n++) {
@@ -766,7 +788,9 @@ void Rainbow::process(const ProcessArgs &args) {
 
 		params[Rainbow::LEVEL_OUT_PARAM + n].setValue(io.OUTLEVEL[n]);
 	}
+	/// (1us)
 
+	// 0.4-0.6us
 	for (int n = 0; n < NUM_CHANNELS; n++) {
 		vuMeters[n].process(args.sampleTime, io.channelLevel[n]);
 	}
@@ -895,6 +919,7 @@ void Rainbow::initialise(void) {
 } 
 
 void Rainbow::prepare(void) {
+	// 0.4us from here until...
 	input.param_read_switches();
 	tuning.update();
 	ring.update_led_ring();
@@ -909,6 +934,9 @@ void Rainbow::prepare(void) {
 	filterbank.process_bank_change();
 	filterbank.process_user_scale_change();
 
+	// ... 0.4us from start to here
+
+	// 0.05us (if blocks)
 	if (io.ROTUP_TRIGGER || io.ROTUP_BUTTON) {
 		rotation.rotate_up();
 	}
@@ -922,6 +950,7 @@ void Rainbow::prepare(void) {
 		rotation.change_scale_down();
 	}
 
+	// 0.56us until end
 	input.process_rotateCV();
 	input.process_scaleCV();
 	levels.update();
