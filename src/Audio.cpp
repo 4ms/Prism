@@ -6,7 +6,6 @@ float Audio::generateNoise() {
 	float nO;
 	switch (noiseSelected) {
 		case 0:
-			// Brown: Add up to 10% processing load (adds up to 2.0us per sample)
 			nO = brown.next() * 10.0f - 5.0f;
 			break;
 		case 1:

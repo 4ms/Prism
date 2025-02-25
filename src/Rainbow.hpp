@@ -123,7 +123,7 @@ struct Audio {
 	float outputScale = 2.0f;
 
 	bogaudio::dsp::PinkNoiseGenerator pink;
-	bogaudio::dsp::RedNoiseGenerator brown;
+	bogaudio::dsp::FastBrownNoiseGenerator brown;
 	bogaudio::dsp::WhiteNoiseGenerator white;
 
 	dsp::SampleRateConverter<1> nInputSrc[NUM_CHANNELS] = {};
