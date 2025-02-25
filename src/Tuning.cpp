@@ -57,8 +57,8 @@ void Tuning::update(void) {
 	
 		if (filterbank->filter_type == MAXQ) {
 			// Read buffer knob and normalize input: 0-1
-			t_fo = (float)(io->FREQNUDGE1_ADC);
-			t_fe = (float)(io->FREQNUDGE6_ADC);
+			float t_fo = io->FREQNUDGE1_ADC;
+			float t_fe = io->FREQNUDGE6_ADC;
 
 			if (io->FREQCV1_CHAN > 1) {
 				f_shift_all[0] = pow(2.0f, io->FREQCV1_CV[0]);
@@ -185,7 +185,7 @@ void Tuning::update(void) {
 
 		} else { // BPRE Filter
 
-			t_fo = (float)(io->FREQNUDGE1_ADC + io->FREQCV1_CV[0]) / 4096.0f;
+			float t_fo = (float)(io->FREQNUDGE1_ADC + io->FREQCV1_CV[0]) / 4096.0f;
 			if (t_fo > 1.0f) {
 				t_fo = 1.0f;
 			}
@@ -193,7 +193,7 @@ void Tuning::update(void) {
 				t_fo = -1.0f;
 			}
 
-			t_fe = (float)(io->FREQNUDGE6_ADC + io->FREQCV6_CV[0]) / 4096.0f;
+			float t_fe = (float)(io->FREQNUDGE6_ADC + io->FREQCV6_CV[0]) / 4096.0f;
 			if (t_fe > 1.0f) {
 				t_fe = 1.0f;
 			}

@@ -689,11 +689,11 @@ void Rainbow::process(const ProcessArgs &args) {
 
 	int noiseSelected 	= params[NOISE_PARAM].getValue();
 
-	io.MORPH_ADC		= std::clamp<int32_t>(params[MORPH_PARAM].getValue() + inputs[MORPH_INPUT].getVoltage() * 409.5f, 0, 4095);
-	io.SPREAD_ADC		= std::clamp<int32_t>(params[SPREAD_PARAM].getValue() + inputs[SPREAD_INPUT].getVoltage() * 409.5f, 0, 4095);
+	io.MORPH_ADC		= std::clamp<uint32_t>(params[MORPH_PARAM].getValue() + inputs[MORPH_INPUT].getVoltage() * 409.5f, 0, 4095);
+	io.SPREAD_ADC		= std::clamp<uint32_t>(params[SPREAD_PARAM].getValue() + inputs[SPREAD_INPUT].getVoltage() * 409.5f, 0, 4095);
 
-	io.GLOBAL_Q_LEVEL	= std::clamp(inputs[GLOBAL_Q_INPUT].getVoltage() * 409.5f, -4095.0f, 4095.0f);
-	io.GLOBAL_Q_CONTROL	= (int16_t)params[GLOBAL_Q_PARAM].getValue();
+	io.GLOBAL_Q_LEVEL	= std::clamp<int32_t>(inputs[GLOBAL_Q_INPUT].getVoltage() * 409.5f, -4095, 4095);
+	io.GLOBAL_Q_CONTROL	= (int32_t)params[GLOBAL_Q_PARAM].getValue();
 
 	io.GLOBAL_LEVEL_ADC = params[GLOBAL_LEVEL_PARAM].getValue() / 4095.0f;
 	io.GLOBAL_LEVEL_CV	= inputs[GLOBAL_LEVEL_INPUT].getVoltage() / 5.0f;
@@ -710,28 +710,28 @@ void Rainbow::process(const ProcessArgs &args) {
 
 		io.LEVEL_ADC[n] 		= std::clamp(params[CHANNEL_LEVEL_PARAM + n].getValue() / 4095.0f, 0.0f, 1.0f);
 		io.CHANNEL_Q_LEVEL[n] 	= std::clamp<int32_t>((inputs[MONO_Q_INPUT + n].getVoltage() + inputs[POLY_Q_INPUT].getVoltage(n)) * 409.5f, -4095, 4095);
-		io.CHANNEL_Q_CONTROL[n]	= params[CHANNEL_Q_PARAM + n].getValue();
+		io.CHANNEL_Q_CONTROL[n]	= (int32_t)params[CHANNEL_Q_PARAM + n].getValue();
 		io.TRANS_DIAL[n]		= params[TRANS_PARAM + n].getValue();
 	}
 	///
 
 	// 0.9us to mark //0.2 with std::clamp //0.43 with first wto clamp, last ones in for loop std::clamp
-	io.FREQNUDGE1_ADC = (int16_t)params[FREQNUDGE1_PARAM].getValue();
-	io.FREQNUDGE6_ADC = (int16_t)params[FREQNUDGE6_PARAM].getValue();
+	io.FREQNUDGE1_ADC = params[FREQNUDGE1_PARAM].getValue();
+	io.FREQNUDGE6_ADC = params[FREQNUDGE6_PARAM].getValue();
 
-	io.SCALE_ADC = std::clamp<uint16_t>(inputs[SCALE_INPUT].getVoltage() * 409.5f, 0, 4095);
-	io.ROTCV_ADC = std::clamp<uint16_t>(inputs[ROTATECV_INPUT].getVoltage() * 409.5f, 0, 4095);
+	io.SCALE_ADC = std::clamp<uint32_t>(inputs[SCALE_INPUT].getVoltage() * 409.5f, 0, 4095);
+	io.ROTCV_ADC = std::clamp<uint32_t>(inputs[ROTATECV_INPUT].getVoltage() * 409.5f, 0, 4095);
 
 	io.FREQCV1_CHAN	= inputs[FREQCV1_INPUT].getChannels();
 	io.FREQCV6_CHAN	= inputs[FREQCV6_INPUT].getChannels();
 	for (int i = 0; i < 3; i++) {
 		io.FREQCV1_CV[i] = std::clamp(inputs[FREQCV1_INPUT].getVoltage(i) * 0.5f, -5.0f, 5.0f); 
-		io.FREQCV6_CV[i] = std::clamp(inputs[FREQCV1_INPUT].getVoltage(i) * 0.5f, -5.0f, 5.0f); 
+		io.FREQCV6_CV[i] = std::clamp(inputs[FREQCV6_INPUT].getVoltage(i) * 0.5f, -5.0f, 5.0f); 
 	}
 	// mark (0.9)
 
 	// 0.1 to mark
-	io.SLEW_ADC	= (uint16_t)params[SLEW_PARAM].getValue();
+	io.SLEW_ADC	= (uint32_t)params[SLEW_PARAM].getValue();
 	io.ENV_SWITCH = (EnvelopeMode)params[ENV_PARAM].getValue();
 
 	if (glissTrigger.process(params[VOCTGLIDE_PARAM].getValue())) {

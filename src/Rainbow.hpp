@@ -325,25 +325,25 @@ struct IO {
 	bool				HICPUMODE;
 	bool				READCOEFFS = true;
 
-	uint16_t			MORPH_ADC;
+	uint32_t			MORPH_ADC;
 
-	int16_t				GLOBAL_Q_LEVEL;
-	int16_t				GLOBAL_Q_CONTROL;
-	int16_t				CHANNEL_Q_LEVEL[NUM_CHANNELS];
-	int16_t				CHANNEL_Q_CONTROL[NUM_CHANNELS];
+	int32_t				GLOBAL_Q_LEVEL;
+	int32_t				GLOBAL_Q_CONTROL;
+	int32_t				CHANNEL_Q_LEVEL[NUM_CHANNELS];
+	int32_t				CHANNEL_Q_CONTROL[NUM_CHANNELS];
 
 	float				GLOBAL_LEVEL_ADC;
 	float				GLOBAL_LEVEL_CV;
 	float				LEVEL_ADC[NUM_CHANNELS];
 	float				LEVEL_CV[NUM_CHANNELS];
 
-	int16_t				FREQNUDGE1_ADC;
-	int16_t				FREQNUDGE6_ADC;
+	float				FREQNUDGE1_ADC;
+	float				FREQNUDGE6_ADC;
 
-	uint16_t			SLEW_ADC;
-	uint16_t			SCALE_ADC;
-	uint16_t			SPREAD_ADC;
-	uint16_t			ROTCV_ADC;
+	uint32_t			SLEW_ADC;
+	uint32_t			SCALE_ADC;
+	uint32_t			SPREAD_ADC;
+	uint32_t			ROTCV_ADC;
 
 	float				FREQCV1_CV[3];
 	int					FREQCV1_CHAN;
@@ -589,8 +589,6 @@ struct Tuning {
 	uint16_t mod_mode_135;
 	uint16_t mod_mode_246;
 
-	float t_fo;
-	float t_fe; // buffers for freq nudge knob readouts 
 	float f_nudge_odds 				= 1;
 	float f_nudge_evens 			= 1;
 
