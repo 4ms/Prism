@@ -21,7 +21,7 @@ RACK_DIR ?= ../..
 include $(RACK_DIR)/plugin.mk
 
 mm-plugin:
-	cmake -B build -G Ninja -DMETAMODULE_SDK_DIR=metamodule-plugin-sdk
+	cmake --fresh -B build -G Ninja -DMETAMODULE_SDK_DIR=metamodule-plugin-sdk
 	cmake --build build
 
 install-mm-sdk:
