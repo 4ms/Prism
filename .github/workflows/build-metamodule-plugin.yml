@@ -17,6 +17,9 @@ on:
         type: boolean
 
 jobs:
+  env:
+    FW_VERSION: ${{ inputs.SDK_branch == 'v2.0-dev' && '-dev-12' || '' }}
+
   build-lin:
     strategy:
         matrix:
