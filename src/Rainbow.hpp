@@ -208,11 +208,6 @@ struct MaxQFilter : TFilter {
 	// buffer for first filter of two-pass
 	float buf_a[NUM_SCALES][NUM_FILTS][3] = {}; 
 
-   	// Filter parameters
-	float qval_b = 0.0f;	
-	float qval_a = 0.0f; 	
-	float qc = 0.0f;
-
 	void reset(FilterBank *fb) override;
 	void filter(FilterBank *fb, int channel_num, float **filter_out) override;
 
@@ -223,11 +218,6 @@ struct MaxQFilter : TFilter {
 struct BpreFilter : TFilter {
 	// filter buffer
 	float buf[NUM_SCALES][NUM_FILTS][3] = {}; 
-
-   	// Filter parameters
-	float qval_b = 0.0f;	
-	float qval_a = 0.0f; 	
-	float qc = 0.0f;
 
 	void reset(FilterBank *fb) override;
 	void filter(FilterBank *fb, int channel_num, float **filter_out) override;
@@ -241,9 +231,6 @@ struct Filter {
 	float buf_a[NUM_CHANNELS][NUM_SCALES][NUM_FILTS][3] = {}; 
 
    	// Filter parameters
-	float qval_b[NUM_CHANNELS] = {};	
-	float qval_a[NUM_CHANNELS] = {};	
-	float qc[NUM_CHANNELS] = {};
 
 	float CROSSFADE_POINT = 4095.0f * 2.0f / 3.0f;
 	float CROSSFADE_WIDTH = 1800.0f;
