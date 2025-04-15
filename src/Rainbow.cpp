@@ -547,10 +547,7 @@ struct Rainbow : core::PrismModule {
 
 void Rainbow::process(const ProcessArgs &args) {
 
-	// <50ns
 	PrismModule::step();
-
-	// Mark 1 start (3.6us until prepare())
 
 	io.UI_UPDATE = false;
 	if (++frameC > frameRate) {
@@ -593,8 +590,6 @@ void Rainbow::process(const ProcessArgs &args) {
 			io.READCOEFFS = true;
 			highCPUModeChanged = false;
 		}
-
-		// 0.2us mean from HERE...
 
 		if (rotCWButtonTrigger.process(params[ROTCW_PARAM].getValue())) {
 			io.ROTUP_BUTTON = true;
@@ -644,7 +639,6 @@ void Rainbow::process(const ProcessArgs &args) {
 			}
 		} 
 
-		// for loop: usually 0.2us could be 0.6us
 		for (int n = 0; n < 6; n++) {
 			// Process Locks
 			if (lockTriggers[n].process(params[LOCKON_PARAM + n].getValue())) {
@@ -657,7 +651,6 @@ void Rainbow::process(const ProcessArgs &args) {
 			}
 		}
 
-		// Here to for loop: 0.6us
 		// Handle bank/filter change
 		nextBank = params[BANK_PARAM].getValue();
 		nextFilter = (FilterSetting)params[FILTER_PARAM].getValue();
@@ -717,7 +710,6 @@ void Rainbow::process(const ProcessArgs &args) {
 	io.GLOBAL_LEVEL_CV	= inputs[GLOBAL_LEVEL_INPUT].getVoltage() / 5.0f;
 
 
-	// for loop: 1.6us
 	for (int n = 0; n < NUM_CHANNELS; n++) {
 		if (!inputs[MONO_LEVEL_INPUT + n].isConnected() && !inputs[POLY_LEVEL_INPUT].isConnected()) { 
 			io.LEVEL_CV[n] = 1.0f;
@@ -730,9 +722,7 @@ void Rainbow::process(const ProcessArgs &args) {
 		io.CHANNEL_Q_CONTROL[n]	= (int32_t)params[CHANNEL_Q_PARAM + n].getValue();
 		io.TRANS_DIAL[n]		= params[TRANS_PARAM + n].getValue();
 	}
-	///
 
-	// 0.9us to mark //0.2 with std::clamp //0.43 with first wto clamp, last ones in for loop std::clamp
 	io.FREQNUDGE1_ADC = params[FREQNUDGE1_PARAM].getValue();
 	io.FREQNUDGE6_ADC = params[FREQNUDGE6_PARAM].getValue();
 
@@ -745,16 +735,11 @@ void Rainbow::process(const ProcessArgs &args) {
 		io.FREQCV1_CV[i] = std::clamp(inputs[FREQCV1_INPUT].getVoltage(i) * 0.5f, -5.0f, 5.0f); 
 		io.FREQCV6_CV[i] = std::clamp(inputs[FREQCV6_INPUT].getVoltage(i) * 0.5f, -5.0f, 5.0f); 
 	}
-	// mark (0.9)
 
 	io.SLEW_ADC	= (uint32_t)params[SLEW_PARAM].getValue();
 
-	// Mark 1 end: 3.6us
-
-	// prepare: 0.9us
 	prepare();
 
-	// This takes 3us - 35us
 	audio.inputChannels = std::min(inputs[POLY_IN_INPUT].getChannels(), 6);
 	audio.outputChannels = params[OUTCHAN_PARAM].getValue(); 
 	audio.noiseSelected = params[NOISE_PARAM].getValue();
@@ -775,10 +760,8 @@ void Rainbow::process(const ProcessArgs &args) {
 		default:
 			audio.ChannelProcess1(io, inputs[POLY_IN_INPUT], outputs[POLY_OUT_OUTPUT], filterbank);
 	}
-	///mark (3-35us)
 
 	// Populate poly outputs
-	// 1us to end of for loop
 	outputs[POLY_VOCT_OUTPUT].setChannels(6);
 	outputs[POLY_ENV_OUTPUT].setChannels(12);
 	for (int n = 0; n < NUM_CHANNELS; n++) {
@@ -790,9 +773,7 @@ void Rainbow::process(const ProcessArgs &args) {
 
 		params[Rainbow::LEVEL_OUT_PARAM + n].setValue(io.OUTLEVEL[n]);
 	}
-	/// (1us)
 
-	// 0.4-0.6us
 	for (int n = 0; n < NUM_CHANNELS; n++) {
 		vuMeters[n].process(args.sampleTime, io.channelLevel[n]);
 	}
