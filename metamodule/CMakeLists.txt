@@ -19,7 +19,7 @@ project(PrismMetaModulePlugin
 
 add_library(Prism STATIC)
 
-set(SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR})
+set(SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/..)
 
 target_sources(Prism
     PRIVATE
@@ -64,10 +64,6 @@ target_sources(Prism
     ${SOURCE_DIR}/src/scales/WC_Alpha2.cpp
     ${SOURCE_DIR}/src/scales/WC_Gamma.cpp
     ${SOURCE_DIR}/src/scales/WC_Gamma_notused.cpp
-)
-
-target_compile_options(Prism
-	PRIVATE 
 )
 
 set_property(TARGET Prism PROPERTY CXX_STANDARD 23)
