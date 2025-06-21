@@ -9,7 +9,9 @@ void init(rack::Plugin *p) {
 	// For each module, specify the ModuleWidget subclass, manufacturer slug (for saving in patches), manufacturer human-readable name, module slug, 
 	// and module name
 	p->addModel(modelRainbow);
+#ifndef METAMODULE
 	p->addModel(modelRainbowScaleExpander);
+#endif
 
 	p->addModel(modelDroplet);
 

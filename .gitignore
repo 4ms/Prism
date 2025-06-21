@@ -8,3 +8,5 @@ dist
 fullhtml
 *Sourcetrail.*
 *cppcheck*
+metamodule-plugin-sdk
+**/*.mmplugin
