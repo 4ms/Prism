@@ -105,6 +105,9 @@ struct Rainbow : core::PrismModule {
 		GLOBAL_LEVEL_INPUT,
 		ENUMS(MONO_Q_INPUT,6),
 		ENUMS(MONO_LEVEL_INPUT,6),
+#if defined(METAMODULE)
+		ENUMS(MONO_CHAN_INPUT,6),
+#endif
 		NUM_INPUTS
 	};
 	enum OutputIds {
@@ -114,6 +117,9 @@ struct Rainbow : core::PrismModule {
 		POLY_DEBUG_OUTPUT,
 		ENUMS(MONO_ENV_OUTPUT,6),
 		ENUMS(MONO_VOCT_OUTPUT,6),
+#if defined(METAMODULE)
+		ENUMS(MONO_CHAN_OUTPUT,6),
+#endif
 		NUM_OUTPUTS
 	};
 	enum LightIds {
@@ -462,8 +468,10 @@ struct Rainbow : core::PrismModule {
 		configParam(SCALECW_PARAM, 0, 1, 0, "Scale CW/Up"); 
 		configParam(SCALECCW_PARAM, 0, 1, 0, "Scale CCW/Down"); 
 
+#if !defined(METAMODULE)
 		configInput(POLY_IN_INPUT, "Poly audio");
     	configOutput(POLY_OUT_OUTPUT, "Poly audio");
+#endif
     	configOutput(POLY_ENV_OUTPUT, "Poly envelope");
     	configOutput(POLY_VOCT_OUTPUT, "Poly V/Oct");
 
@@ -483,6 +491,10 @@ struct Rainbow : core::PrismModule {
 		configInput(LOCK246_INPUT, "Lock 6-246");
 
 		for (int i = 0; i < NUM_CHANNELS; i++) {
+#if defined(METAMODULE)
+			configInput(MONO_CHAN_INPUT + i, string::f("Channel %i Audio", i + 1));
+			configOutput(MONO_CHAN_OUTPUT + i, string::f("Channel %i Audio", i + 1));
+#endif
 			configInput(MONO_LEVEL_INPUT + i, string::f("Mono level CV %i", i + 1));
 			configInput(MONO_Q_INPUT + i, string::f("Mono Q %i", i + 1));
 			configOutput(MONO_VOCT_OUTPUT + i, string::f("Mono V/Oct %i", i + 1));
@@ -746,6 +758,9 @@ void Rainbow::process(const ProcessArgs &args) {
 	audio.internalSampleRate = internalSampleRate;
 	audio.outputScale = freqScale;
 
+#if defined(METAMODULE)
+#else
+
 	switch(audio.outputChannels) {
 		case 0:
 			audio.ChannelProcess1(io, inputs[POLY_IN_INPUT], outputs[POLY_OUT_OUTPUT], filterbank);
@@ -772,6 +787,7 @@ void Rainbow::process(const ProcessArgs &args) {
 
 		params[Rainbow::LEVEL_OUT_PARAM + n].setValue(io.OUTLEVEL[n]);
 	}
+#endif
 
 	for (int n = 0; n < NUM_CHANNELS; n++) {
 		vuMeters[n].process(args.sampleTime, io.channelLevel[n]);
@@ -1154,7 +1170,9 @@ struct RainbowWidget : ModuleWidget {
 		addInput(createInputCentered<gui::PrismPort>(Vec(475.500 + 11.0, 380.0f - 103.000 - 11.0), module, Rainbow::SCALE_INPUT));
 		addInput(createInputCentered<gui::PrismPort>(Vec(515.000 + 11.0, 380.0f - 56.000 - 11.0), module, Rainbow::LOCK135_INPUT));
 		addInput(createInputCentered<gui::PrismPort>(Vec(515.000 + 11.0, 380.0f - 26.000 - 11.0), module, Rainbow::LOCK246_INPUT));
+#if !defined(METAMODULE)
 		addInput(createInputCentered<gui::PrismPort>(Vec(35.000 + 11.0, 380.0f - 240.000 - 11.0), module, Rainbow::POLY_IN_INPUT));
+#endif
 		addInput(createInputCentered<gui::PrismPort>(Vec(555.000 + 11.0, 380.0f - 263.000 - 11.0), module, Rainbow::MORPH_INPUT));
 		addInput(createInputCentered<gui::PrismPort>(Vec(395.000 + 11.0, 380.0f - 263.000 - 11.0), module, Rainbow::SPREAD_INPUT));
 		addInput(createInputCentered<gui::PrismPort>(Vec(35.000 + 11.0, 380.0f - 26.000 - 11.0), module, Rainbow::GLOBAL_Q_INPUT));
@@ -1176,7 +1194,15 @@ struct RainbowWidget : ModuleWidget {
 		addInput(createInputCentered<gui::PrismPort>(Vec(275.000 + 11.0, 380.0f - 126.000 - 11.0), module, Rainbow::MONO_LEVEL_INPUT+4));
 		addInput(createInputCentered<gui::PrismPort>(Vec(315.000 + 11.0, 380.0f - 126.000 - 11.0), module, Rainbow::MONO_LEVEL_INPUT+5));
 
+#if defined(METAMODULE)
+		for (auto i = 0u; i < NUM_CHANNELS; i++) {
+			addInput(createInputCentered<gui::PrismPort>(Vec(35.000 + 11.0, 380.0f - 240.000 - 11.0), module, Rainbow::MONO_CHAN_INPUT + i));
+			addOutput(createOutputCentered<gui::PrismPort>(Vec(35.000 + 11.0, 380.0f - 318.000 - 11.0), module, Rainbow::MONO_CHAN_OUTPUT + i));
+		}
+#else		
 		addOutput(createOutputCentered<gui::PrismPort>(Vec(35.000 + 11.0, 380.0f - 318.000 - 11.0), module, Rainbow::POLY_OUT_OUTPUT));
+#endif
+
 		addOutput(createOutputCentered<gui::PrismPort>(Vec(355.000 + 11.0, 380.0f - 240.000 - 11.0), module, Rainbow::POLY_ENV_OUTPUT));
 		addOutput(createOutputCentered<gui::PrismPort>(Vec(355.000 + 11.0, 380.0f - 318.000 - 11.0), module, Rainbow::POLY_VOCT_OUTPUT));
 
