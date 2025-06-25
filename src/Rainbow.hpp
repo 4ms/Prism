@@ -176,6 +176,9 @@ struct Audio {
 	void ChannelProcess1(rainbow::IO &io, std::span<Input> input, std::span<Output> output, rainbow::FilterBank &filterbank);
 	void ChannelProcess2(rainbow::IO &io, std::span<Input> input, std::span<Output> output, rainbow::FilterBank &filterbank);
 	void ChannelProcess6(rainbow::IO &io, std::span<Input> input, std::span<Output> output, rainbow::FilterBank &filterbank);
+	void ChannelProcessNoResample(rainbow::IO &io, std::span<Input> input, std::span<Output> output, rainbow::FilterBank &filterbank);
+
+	unsigned block_ctr = 0;
 #endif
 };
 
