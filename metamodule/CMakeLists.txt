@@ -23,7 +23,7 @@ set(SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/..)
 
 target_sources(Prism
     PRIVATE
-    ${SOURCE_DIR}/src/Audio.cpp
+    Audio.cpp
     ${SOURCE_DIR}/src/Droplet.cpp
     ${SOURCE_DIR}/src/DropletAudio.cpp
     ${SOURCE_DIR}/src/DropletFilter.cpp
