@@ -312,12 +312,108 @@ void Audio::ChannelProcess6(rainbow::IO &io,
 	}
 }
 
+void Audio::ChannelProcessNoResample(rainbow::IO &io,
+									 std::span<Input> input,
+									 std::span<Output> output,
+									 rainbow::FilterBank &filterbank) {
+
+	// no jacks: 26% load +1% each jack => 32% 6 jacks
+	// Any jack configuration: 0.56us sample; 20.6us block
+	constexpr static int32_t I_MIN_24BIT = -16777216;
+	constexpr static int32_t I_MAX_24BIT = 16777215;
+
+	// Count inputs
+	inputChannels = 0;
+	for (auto i = 0u; i < input.size(); i++) {
+		if (input[i].isConnected())
+			inputChannels = i + 1;
+	}
+
+	int inChannels = std::max(1, inputChannels);
+
+	// Route input jacks to filter inputs
+	if (inChannels == 1) {
+		auto n = inputChannels == 0 ? generateNoise() : input[0].getVoltage();
+		int32_t v = std::clamp<int32_t>(n * (Audio::MAX_12BIT / 5.f), I_MIN_24BIT, I_MAX_24BIT);
+
+		io.in[0][block_ctr] = v;
+		io.in[1][block_ctr] = v;
+		io.in[2][block_ctr] = v;
+		io.in[3][block_ctr] = v;
+		io.in[4][block_ctr] = v;
+		io.in[5][block_ctr] = v;
+
+	} else if (inChannels == 2) {
+		for (auto i = 0; i < inChannels; i++) {
+			auto n = input[i].getVoltage();
+			int32_t v = std::clamp<int32_t>(n * (Audio::MAX_12BIT / 5.f), I_MIN_24BIT, I_MAX_24BIT);
+
+			io.in[0 + i][block_ctr] = v;
+			io.in[2 + i][block_ctr] = v;
+			io.in[4 + i][block_ctr] = v;
+		}
+
+	} else if (inChannels == 3) {
+		for (auto i = 0; i < inChannels; i++) {
+			auto n = input[i].getVoltage();
+			int32_t v = std::clamp<int32_t>(n * (Audio::MAX_12BIT / 5.f), I_MIN_24BIT, I_MAX_24BIT);
+
+			io.in[0 + i * 2][block_ctr] = v;
+			io.in[1 + i * 2][block_ctr] = v;
+		}
+
+	} else {
+		for (auto i = 0; i < inChannels; i++) {
+			auto n = input[i].getVoltage();
+			int32_t v = std::clamp<int32_t>(n * (Audio::MAX_12BIT / 5.f), I_MIN_24BIT, I_MAX_24BIT);
+			io.in[i][block_ctr] = v;
+		}
+	}
+
+	// Route filter outputs to output jacks
+	if (outputChannels == 0) {
+		// 6 => 1
+		float out = 0;
+		for (int chan = 0; chan < NUM_CHANNELS; chan++) {
+			out += io.out[chan][block_ctr] / Audio::MAX_12BIT;
+		}
+		output[0].setVoltage(out * outputScale);
+
+	} else if (outputChannels == 1) {
+		// 6 => 2
+		float channel[2] = {0, 0};
+		for (int chan = 0; chan < NUM_CHANNELS; chan++) {
+			channel[chan & 1] += io.out[chan][block_ctr] / Audio::MAX_12BIT;
+		}
+		output[0].setVoltage(channel[0] * outputScale);
+		output[1].setVoltage(channel[1] * outputScale);
+
+	} else if (outputChannels == 2) {
+		// 6 => 6
+		for (auto chan = 0u; chan < NUM_CHANNELS; chan++) {
+			auto sample = io.out[chan][block_ctr] / Audio::MAX_12BIT;
+			output[chan].setVoltage(sample * outputScale);
+		}
+	}
+
+	block_ctr++;
+
+	// Process blocks
+	if (block_ctr >= NUM_SAMPLES) {
+		block_ctr = 0;
+		filterbank.process_audio_block();
+	}
+}
+
 void Audio::ChannelProcess(rainbow::IO &io,
 						   std::span<Input> input,
 						   std::span<Output> output,
 						   rainbow::FilterBank &filterbank) {
 
-	if (outputChannels == 0)
+	if (internalSampleRate == sampleRate)
+		ChannelProcessNoResample(io, input, output, filterbank);
+
+	else if (outputChannels == 0)
 		ChannelProcess1(io, input, output, filterbank);
 
 	else if (outputChannels == 1)
