@@ -12,6 +12,9 @@ constexpr const T& clamp(const T& v, const T& x, const T& y) {
     return (v < x) ? x : (y < v) ? y : v;
 }}
 #endif*/
+#if defined(METAMODULE)
+#include <span>
+#endif
 
 #include <array>
 #include <bitset>
@@ -163,9 +166,17 @@ struct Audio {
 	dsp::Frame<NUM_CHANNELS> outputFrames6[NUM_SAMPLES] = {};
 
    	float generateNoise();
+
+#if !defined(METAMODULE)
 	void ChannelProcess1(rainbow::IO &io, rack::engine::Input &input, rack::engine::Output &output, rainbow::FilterBank &filterbank);
 	void ChannelProcess2(rainbow::IO &io, rack::engine::Input &input, rack::engine::Output &output, rainbow::FilterBank &filterbank);
 	void ChannelProcess6(rainbow::IO &io, rack::engine::Input &input, rack::engine::Output &output, rainbow::FilterBank &filterbank);
+#else
+	void ChannelProcess(rainbow::IO &io, std::span<Input> input, std::span<Output> output, rainbow::FilterBank &filterbank);
+	void ChannelProcess1(rainbow::IO &io, std::span<Input> input, std::span<Output> output, rainbow::FilterBank &filterbank);
+	void ChannelProcess2(rainbow::IO &io, std::span<Input> input, std::span<Output> output, rainbow::FilterBank &filterbank);
+	void ChannelProcess6(rainbow::IO &io, std::span<Input> input, std::span<Output> output, rainbow::FilterBank &filterbank);
+#endif
 };
 
 struct Envelope {
